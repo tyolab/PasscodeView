@@ -23,6 +23,7 @@ import android.widget.TextView;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import static com.hanks.passcodeview.PasscodeView.PasscodeViewType.TYPE_ACCEPT_PASSCODE;
 import static com.hanks.passcodeview.PasscodeView.PasscodeViewType.TYPE_CHECK_PASSCODE;
 import static com.hanks.passcodeview.PasscodeView.PasscodeViewType.TYPE_SET_PASSCODE;
 
@@ -359,11 +360,18 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
             return;
         }
 
-        if (equals(psd)) {
-            // match
-            runOkAnimation();
-        } else {
-            runWrongAnimation();
+        if (passcodeType == TYPE_ACCEPT_PASSCODE) {
+            if (listener != null) {
+                listener.onSuccess(getPasscodeFromView());
+            }
+        }
+        else {
+            if (equals(psd)) {
+                // match
+                runOkAnimation();
+            } else {
+                runWrongAnimation();
+            }
         }
     }
 
@@ -493,7 +501,7 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
     /**
      * The type for this passcodeView
      */
-    @IntDef({TYPE_SET_PASSCODE, TYPE_CHECK_PASSCODE})
+    @IntDef({TYPE_SET_PASSCODE, TYPE_CHECK_PASSCODE, TYPE_ACCEPT_PASSCODE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface PasscodeViewType {
 
@@ -506,6 +514,11 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
          * check passcode, must pass the result as parameter {@link PasscodeView#setLocalPasscode(java.lang.String)}
          */
         int TYPE_CHECK_PASSCODE = 1;
+
+        /**
+         * accept passcode, with one input
+         */
+        int TYPE_ACCEPT_PASSCODE = 2;
     }
 
     public interface PasscodeViewListener {
