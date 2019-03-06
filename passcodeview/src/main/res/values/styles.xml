@@ -10,4 +10,8 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/text_black</item>
     </style>
+
+    <style name="LockBackground">
+        <item name="android:background">#FFFFFF</item>
+    </style>
 </resources>

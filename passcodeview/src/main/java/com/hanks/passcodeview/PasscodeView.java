@@ -3,9 +3,11 @@ package com.hanks.passcodeview;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.PorterDuff;
+import android.os.Build;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -44,6 +46,8 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
     private ImageView iv_lock, iv_ok;
     private View cursor;
 
+    private ImageView iv_background;
+
     private String firstInputTip = "Enter a passcode of 4 digits";
     private String secondInputTip = "Re-enter new passcode";
     private String wrongLengthTip = "Enter a passcode of 4 digits";
@@ -58,29 +62,50 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
     private int passcodeType = TYPE_SET_PASSCODE;
 
     public PasscodeView(@NonNull Context context) {
-        this(context, null);
+        super(context);
+
+        init(context, null);
     }
 
     public PasscodeView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
+        init(context, attrs);
+    }
+
+    public PasscodeView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+
+        init(context, attrs);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public PasscodeView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+
+        init(context, attrs);
+    }
+
+    private void init(Context context, AttributeSet attrs) {
         inflate(getContext(), R.layout.layout_passcode_view, this);
 
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.PasscodeView);
-        try {
-            passcodeType = typedArray.getInt(R.styleable.PasscodeView_passcodeViewType, passcodeType);
-            passcodeLength = typedArray.getInt(R.styleable.PasscodeView_passcodeLength, passcodeLength);
-            normalStatusColor = typedArray.getColor(R.styleable.PasscodeView_normalStateColor, normalStatusColor);
-            wrongStatusColor = typedArray.getColor(R.styleable.PasscodeView_wrongStateColor, wrongStatusColor);
-            correctStatusColor = typedArray.getColor(R.styleable.PasscodeView_correctStateColor, correctStatusColor);
-            numberTextColor = typedArray.getColor(R.styleable.PasscodeView_numberTextColor, numberTextColor);
-            firstInputTip = typedArray.getString(R.styleable.PasscodeView_firstInputTip);
-            secondInputTip = typedArray.getString(R.styleable.PasscodeView_secondInputTip);
-            wrongLengthTip = typedArray.getString(R.styleable.PasscodeView_wrongLengthTip);
-            wrongInputTip = typedArray.getString(R.styleable.PasscodeView_wrongInputTip);
-            correctInputTip = typedArray.getString(R.styleable.PasscodeView_correctInputTip);
-        } finally {
-            typedArray.recycle();
+        if (null != attrs) {
+            TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.PasscodeView);
+            try {
+                passcodeType = typedArray.getInt(R.styleable.PasscodeView_passcodeViewType, passcodeType);
+                passcodeLength = typedArray.getInt(R.styleable.PasscodeView_passcodeLength, passcodeLength);
+                normalStatusColor = typedArray.getColor(R.styleable.PasscodeView_normalStateColor, normalStatusColor);
+                wrongStatusColor = typedArray.getColor(R.styleable.PasscodeView_wrongStateColor, wrongStatusColor);
+                correctStatusColor = typedArray.getColor(R.styleable.PasscodeView_correctStateColor, correctStatusColor);
+                numberTextColor = typedArray.getColor(R.styleable.PasscodeView_numberTextColor, numberTextColor);
+                firstInputTip = typedArray.getString(R.styleable.PasscodeView_firstInputTip);
+                secondInputTip = typedArray.getString(R.styleable.PasscodeView_secondInputTip);
+                wrongLengthTip = typedArray.getString(R.styleable.PasscodeView_wrongLengthTip);
+                wrongInputTip = typedArray.getString(R.styleable.PasscodeView_wrongInputTip);
+                correctInputTip = typedArray.getString(R.styleable.PasscodeView_correctInputTip);
+            } finally {
+                typedArray.recycle();
+            }
         }
 
         firstInputTip = firstInputTip == null ? "Enter a passcode of 4 digits" : firstInputTip;
@@ -89,17 +114,12 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
         wrongInputTip = wrongInputTip == null ? "Passcode do not match" : wrongInputTip;
         correctInputTip = correctInputTip == null ? "Passcode is correct" : correctInputTip;
 
-        init();
-    }
-
-
-    private void init() {
-
         layout_psd = (ViewGroup) findViewById(R.id.layout_psd);
         tv_input_tip = (TextView) findViewById(R.id.tv_input_tip);
         cursor = findViewById(R.id.cursor);
         iv_lock = (ImageView) findViewById(R.id.iv_lock);
         iv_ok = (ImageView) findViewById(R.id.iv_ok);
+        //iv_background = (ImageView) findViewById(R.id.iv_background);
 
         tv_input_tip.setText(firstInputTip);
 
@@ -140,11 +160,6 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
             }
         });
 
-        tintImageView(iv_lock, numberTextColor);
-        tintImageView(numberB, numberTextColor);
-        tintImageView(numberOK, numberTextColor);
-        tintImageView(iv_ok, correctStatusColor);
-
         number0.setTag(0);
         number1.setTag(1);
         number2.setTag(2);
@@ -166,6 +181,16 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
         number8.setTextColor(numberTextColor);
         number9.setTextColor(numberTextColor);
 
+        numberB.setImageDrawable(ResourcesUtils.getVectorDrawable(context, R.drawable.backspace));
+        numberOK.setImageDrawable(ResourcesUtils.getVectorDrawable(context, R.drawable.ic_check_bold_24dp));
+        iv_lock.setImageDrawable(ResourcesUtils.getVectorDrawable(context, R.drawable.lock));
+        iv_ok.setImageDrawable(ResourcesUtils.getVectorDrawable(context, R.drawable.ic_check_bold_24dp));
+        //iv_background.setImageDrawable(ResourcesUtils.getVectorDrawable(context, R.drawable.lock_bg_white));
+
+        tintImageView(iv_lock, numberTextColor);
+        tintImageView(numberB, numberTextColor);
+        tintImageView(numberOK, numberTextColor);
+        tintImageView(iv_ok, correctStatusColor);
     }
 
     @Override
@@ -527,4 +552,5 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
 
         void onSuccess(String number);
     }
+
 }
