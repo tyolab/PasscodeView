@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2019. TYONLINE TECHNOLOGY PTY. LTD. (TYOLAB)
+  ~
+  -->
+
+<resources>
+    <style name="LockBackground">
+        <item name="android:background">@drawable/lock_bg_white</item>
+    </style>
+</resources>
