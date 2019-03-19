@@ -48,13 +48,17 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
 
     private ImageView iv_background;
 
-    private String firstInputTip = "Enter a passcode of 4 digits";
+    private String firstInputTip = "Enter a passcode of 6 digits";
     private String secondInputTip = "Re-enter new passcode";
-    private String wrongLengthTip = "Enter a passcode of 4 digits";
+    private String wrongLengthTip = "Enter a passcode of 6 digits";
     private String wrongInputTip = "Passcode do not match";
     private String correctInputTip = "Passcode is correct";
 
-    private int passcodeLength = 4;
+    /**
+     * Make it default 6
+     */
+    private int passcodeLength = 6;
+
     private int correctStatusColor = 0xFF61C560; //0xFFFF0000
     private int wrongStatusColor = 0xFFF24055;
     private int normalStatusColor = 0xFFFFFFFF;
@@ -108,7 +112,7 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
             }
         }
 
-        firstInputTip = firstInputTip == null ? "Enter a passcode of 4 digits" : firstInputTip;
+        firstInputTip = firstInputTip == null ? "Enter a passcode of " + passcodeLength +" digits" : firstInputTip;
         secondInputTip = secondInputTip == null ? "Re-enter new passcode" : secondInputTip;
         wrongLengthTip = wrongLengthTip == null ? firstInputTip : wrongLengthTip;
         wrongInputTip = wrongInputTip == null ? "Passcode do not match" : wrongInputTip;
@@ -191,6 +195,11 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
         tintImageView(numberB, numberTextColor);
         tintImageView(numberOK, numberTextColor);
         tintImageView(iv_ok, correctStatusColor);
+    }
+
+    public void initializeTips() {
+        firstInputTip = "Enter a passcode of " + passcodeLength + " digits";
+        wrongLengthTip = "Enter a passcode of " + passcodeLength + " digits";
     }
 
     @Override
@@ -329,6 +338,11 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
         return this;
     }
 
+    public void clear() {
+        clearChar();
+        localPasscode = "";
+    }
+
     /**
      * <pre>
      * passcodeView.setListener(new PasscodeView.PasscodeViewListener() {
@@ -366,7 +380,7 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
 
     private void next() {
         if (passcodeType == TYPE_CHECK_PASSCODE && TextUtils.isEmpty(localPasscode)) {
-            throw new RuntimeException("must set localPasscode when type is TYPE_CHECK_PASSCODE");
+            throw new RuntimeException("must set local passcode when type is TYPE_CHECK_PASSCODE");
         }
 
         String psd = getPasscodeFromView();
@@ -423,7 +437,7 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
         imageView.getDrawable().mutate().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
     }
 
-    private void clearChar() {
+    public void clearChar() {
         layout_psd.removeAllViews();
     }
 
@@ -458,7 +472,8 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
                             public void onAnimationEnd(Animator animation) {
                                 super.onAnimationEnd(animation);
                                 setPSDViewBackgroundResource(normalStatusColor);
-                                if (secondInput && listener != null) {
+                                if (listener != null) {
+                                    // doesn't need to check if secondInput as it has been done in next function
                                     listener.onFail();
                                 }
                             }
