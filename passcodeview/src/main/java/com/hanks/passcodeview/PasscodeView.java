@@ -7,6 +7,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -64,6 +65,12 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
     private int normalStatusColor = 0xFFFFFFFF;
     private int numberTextColor = 0xFF747474;
     private int passcodeType = TYPE_SET_PASSCODE;
+
+    /**
+     * Drawables resources
+     *
+     */
+    private Drawable drawableLock;
 
     public PasscodeView(@NonNull Context context) {
         super(context);
@@ -187,7 +194,7 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
 
         numberB.setImageDrawable(ResourcesUtils.getVectorDrawable(context, R.drawable.backspace));
         numberOK.setImageDrawable(ResourcesUtils.getVectorDrawable(context, R.drawable.ic_check_bold_24dp));
-        iv_lock.setImageDrawable(ResourcesUtils.getVectorDrawable(context, R.drawable.lock));
+        iv_lock.setImageDrawable((drawableLock = ResourcesUtils.getVectorDrawable(context, R.drawable.lock)));
         iv_ok.setImageDrawable(ResourcesUtils.getVectorDrawable(context, R.drawable.ic_check_bold_24dp));
         //iv_background.setImageDrawable(ResourcesUtils.getVectorDrawable(context, R.drawable.lock_bg_white));
 
@@ -225,7 +232,6 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
             }
         }
         this.localPasscode = localPasscode;
-        this.passcodeType = TYPE_CHECK_PASSCODE;
         return this;
     }
 
@@ -340,7 +346,13 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
 
     public void clear() {
         clearChar();
-        localPasscode = "";
+        tv_input_tip.setText(firstInputTip);
+        // iv_lock.setImageDrawable(drawableLock);
+        iv_lock.setVisibility(VISIBLE);
+        // tintImageView(iv_lock, numberTextColor);
+        iv_ok.setVisibility(GONE);
+        // iv_ok.animate().alpha(0).scaleX(0).scaleY(0).setDuration(100).start();
+        iv_lock.animate().alpha(1).scaleX(1).scaleY(1).setDuration(100).start();
     }
 
     /**
@@ -510,6 +522,8 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
                         cursor.setVisibility(INVISIBLE);
                         setPSDViewBackgroundResource(correctStatusColor);
                         tv_input_tip.setText(correctInputTip);
+                        iv_lock.setVisibility(GONE);
+                        iv_ok.setVisibility(VISIBLE);
                         iv_lock.animate().alpha(0).scaleX(0).scaleY(0).setDuration(500).start();
                         iv_ok.animate().alpha(1).scaleX(1).scaleY(1).setDuration(500)
                                 .setListener(new AnimatorListenerAdapter() {
