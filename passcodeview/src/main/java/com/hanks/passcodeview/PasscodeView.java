@@ -66,6 +66,12 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
     private int numberTextColor = 0xFF747474;
     private int passcodeType = TYPE_SET_PASSCODE;
 
+    private CodeVerifier codeVerifier;
+
+    public interface CodeVerifier {
+        boolean verify(String code);
+    }
+
     /**
      * Drawables resources
      *
@@ -202,6 +208,12 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
         tintImageView(numberB, numberTextColor);
         tintImageView(numberOK, numberTextColor);
         tintImageView(iv_ok, correctStatusColor);
+
+        codeVerifier = null;
+    }
+
+    public void setCodeVerifier(CodeVerifier codeVerifier) {
+        this.codeVerifier = codeVerifier;
     }
 
     public void initializeTips() {
@@ -387,13 +399,16 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
      * @return true if val is right passcode
      */
     protected boolean equals(String val) {
+        if (TextUtils.isEmpty(localPasscode) && null != codeVerifier)
+            return codeVerifier.verify(val);
         return localPasscode.equals(val);
     }
 
     private void next() {
-        if (passcodeType == TYPE_CHECK_PASSCODE && TextUtils.isEmpty(localPasscode)) {
-            throw new RuntimeException("must set local passcode when type is TYPE_CHECK_PASSCODE");
-        }
+        // Not to worry about that
+        // if (passcodeType == TYPE_CHECK_PASSCODE && TextUtils.isEmpty(localPasscode)) {
+        //     throw new RuntimeException("must set local passcode when type is TYPE_CHECK_PASSCODE");
+        // }
 
         String psd = getPasscodeFromView();
         if (psd.length() != passcodeLength) {
@@ -530,6 +545,11 @@ public class PasscodeView extends FrameLayout implements View.OnClickListener {
                                     @Override
                                     public void onAnimationEnd(Animator animation) {
                                         super.onAnimationEnd(animation);
+
+                                        /**
+                                         * clear the passcode from the memory
+                                         */
+                                        localPasscode = "";
                                         if (listener != null) {
                                             listener.onSuccess(getPasscodeFromView());
                                         }
