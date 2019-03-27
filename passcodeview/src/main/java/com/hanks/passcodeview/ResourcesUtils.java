@@ -8,8 +8,8 @@ package com.hanks.passcodeview;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.graphics.drawable.VectorDrawableCompat;
-import android.support.v7.content.res.AppCompatResources;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
+import androidx.appcompat.content.res.AppCompatResources;
 
 public class ResourcesUtils {
 
